@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SectionCard from '../components/SectionCard';
 import DataTable from '../components/DataTable';
 
 const OrganizationDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
   
   const organization = {
     id: 615,
@@ -23,7 +25,8 @@ const OrganizationDetails = () => {
     allowCountries: "Malaysia",
     allowedProfessionalFromAnyCountry: false,
     allowedCountriesForProfessional: "Malaysia",
-    creditAmount: 1500
+    creditAmount: 1500,
+    remaining: 300
   };
 
   const deals = [
@@ -192,7 +195,23 @@ const OrganizationDetails = () => {
             
             <div className="torch-form-group">
               <label>Credit Amount:</label>
-              {renderField('Credit Amount', organization.creditAmount, 'number')}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {isEditing ? (
+                  <input type="number" defaultValue={organization.creditAmount} />
+                ) : (
+                  <span className="torch-field-value">
+                    {organization.remaining || 300} / {organization.creditAmount}
+                  </span>
+                )}
+                {!isEditing && (
+                  <button 
+                    className="torch-btn torch-btn-secondary"
+                    onClick={() => navigate(`/credits/${organization.id}/manage`)}
+                  >
+                    Manage Credit
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </SectionCard>

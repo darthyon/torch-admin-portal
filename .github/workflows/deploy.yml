@@ -32,4 +32,5 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
-        cname: # Leave empty for default domain
+        destination_dir: ./docs
+        force_orphan: true

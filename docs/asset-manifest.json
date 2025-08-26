@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/torch-admin-portal/static/css/main.7ef87f78.css",
+    "main.js": "/torch-admin-portal/static/js/main.e051f143.js",
+    "index.html": "/torch-admin-portal/index.html",
+    "main.7ef87f78.css.map": "/torch-admin-portal/static/css/main.7ef87f78.css.map",
+    "main.e051f143.js.map": "/torch-admin-portal/static/js/main.e051f143.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7ef87f78.css",
+    "static/js/main.e051f143.js"
+  ]
+}

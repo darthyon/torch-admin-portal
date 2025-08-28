@@ -194,23 +194,17 @@ const OrganizationDetails = () => {
             </div>
             
             <div className="torch-form-group">
-              <label>Credit Amount:</label>
+              <label>Initial Credit Amount:</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {isEditing ? (
-                  <input type="number" defaultValue={organization.creditAmount} />
-                ) : (
-                  <span className="torch-field-value">
-                    {organization.remaining || 300} / {organization.creditAmount}
-                  </span>
-                )}
-                {!isEditing && (
-                  <button 
-                    className="torch-btn torch-btn-secondary"
-                    onClick={() => navigate(`/credits/${organization.id}/manage`)}
-                  >
-                    Manage Credit
-                  </button>
-                )}
+                <span className="torch-field-value">
+                  {organization.creditAmount} credits
+                </span>
+                <button 
+                  className="torch-btn torch-btn-secondary"
+                  onClick={() => navigate(`/credits/${organization.id}/manage`)}
+                >
+                  Manage Credit
+                </button>
               </div>
             </div>
           </div>

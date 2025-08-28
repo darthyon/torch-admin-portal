@@ -9,6 +9,10 @@ const Credits = () => {
   const [showOrgDetails, setShowOrgDetails] = useState(false);
   const [anchorToTransactions, setAnchorToTransactions] = useState(false);
   const [activeTab, setActiveTab] = useState('core-services');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [currentTransactionPage, setCurrentTransactionPage] = useState(1);
+  const [transactionItemsPerPage] = useState(3);
   const navigate = useNavigate();
 
   // Organizations data - memoized to prevent unnecessary re-renders
@@ -20,7 +24,9 @@ const Credits = () => {
       used: 1200,
       remaining: 300,
       currency: "RM",
-      location: "Malaysia"
+      location: "Malaysia",
+      expiringSoon: 50,
+      consumptionRate: 45
     },
     {
       id: 2,
@@ -29,7 +35,9 @@ const Credits = () => {
       used: 1500,
       remaining: 500,
       currency: "$",
-      location: "Singapore"
+      location: "Singapore",
+      expiringSoon: 75,
+      consumptionRate: 60
     },
     {
       id: 3,
@@ -38,7 +46,9 @@ const Credits = () => {
       used: 2100,
       remaining: 900,
       currency: "RM",
-      location: "Malaysia"
+      location: "Malaysia",
+      expiringSoon: 120,
+      consumptionRate: 85
     },
     {
       id: 4,
@@ -47,7 +57,9 @@ const Credits = () => {
       used: 1800,
       remaining: 700,
       currency: "$",
-      location: "Singapore"
+      location: "Singapore",
+      expiringSoon: 90,
+      consumptionRate: 70
     },
     {
       id: 5,
@@ -56,7 +68,42 @@ const Credits = () => {
       used: 950,
       remaining: 850,
       currency: "$",
-      location: "Singapore"
+      location: "Singapore",
+      expiringSoon: 40,
+      consumptionRate: 35
+    },
+    {
+      id: 6,
+      name: "Seatrium",
+      purchased: 2200,
+      used: 1600,
+      remaining: 600,
+      currency: "$",
+      location: "Singapore",
+      expiringSoon: 80,
+      consumptionRate: 55
+    },
+    {
+      id: 7,
+      name: "Franklin Templeton",
+      purchased: 2800,
+      used: 1900,
+      remaining: 900,
+      currency: "$",
+      location: "Malaysia",
+      expiringSoon: 100,
+      consumptionRate: 75
+    },
+    {
+      id: 8,
+      name: "Air Selangor",
+      purchased: 1600,
+      used: 1100,
+      remaining: 500,
+      currency: "RM",
+      location: "Malaysia",
+      expiringSoon: 60,
+      consumptionRate: 40
     }
   ], []);
 
@@ -308,6 +355,26 @@ const Credits = () => {
     }
   };
 
+  // Pagination logic for organizations
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentOrganizations = organizations.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(organizations.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Pagination logic for transactions
+  const indexOfLastTransaction = currentTransactionPage * transactionItemsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - transactionItemsPerPage;
+  const currentTransactions = overallTransactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
+  const totalTransactionPages = Math.ceil(overallTransactions.length / transactionItemsPerPage);
+
+  const handleTransactionPageChange = (pageNumber) => {
+    setCurrentTransactionPage(pageNumber);
+  };
+
   // Note: These functions are kept for future implementation
   // They are currently not used but will be needed for full functionality
   
@@ -430,7 +497,12 @@ const Credits = () => {
           {/* Client Summary Section */}
           <SectionCard title="Client Summary">
             <div style={{ padding: '20px' }}>
-              <div className="torch-kpi-row" style={{ marginBottom: '0px' }}>
+              <div className="torch-kpi-grid" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(3, 1fr)', 
+                gap: '20px', 
+                marginBottom: '0px' 
+              }}>
                 <div className="torch-card">
                   <div className="torch-card-header">Total Credits Purchased</div>
                   <div className="torch-card-value">{selectedOrg?.purchased} credits</div>
@@ -451,6 +523,31 @@ const Credits = () => {
                   <div className="torch-card-value">{Math.round((selectedOrg?.used / selectedOrg?.purchased) * 100)}%</div>
                   <div className="torch-card-subtitle">Current Usage</div>
                 </div>
+                <div className="torch-card">
+                  <div className="torch-card-header">Expiring Soon Credits</div>
+                  <div className="torch-card-value">{selectedOrg?.expiringSoon || 0} credits</div>
+                  <div className="torch-card-subtitle">Next 30 Days</div>
+                </div>
+                <div className="torch-card">
+                  <div className="torch-card-header">Consumption Rate</div>
+                  <div className="torch-card-value">{selectedOrg?.consumptionRate || 0} credits</div>
+                  <div className="torch-card-subtitle">Per Week</div>
+                </div>
+                <div className="torch-card">
+                  <div className="torch-card-header">Last Top-up</div>
+                  <div className="torch-card-value">2 weeks ago</div>
+                  <div className="torch-card-subtitle">Recent Activity</div>
+                </div>
+                <div className="torch-card">
+                  <div className="torch-card-header">Credit Efficiency</div>
+                  <div className="torch-card-value">85%</div>
+                  <div className="torch-card-subtitle">Usage vs Allocation</div>
+                </div>
+                <div className="torch-card">
+                  <div className="torch-card-header">Projected Usage</div>
+                  <div className="torch-card-value">1,800</div>
+                  <div className="torch-card-subtitle">Next Month</div>
+                </div>
               </div>
             </div>
           </SectionCard>
@@ -460,7 +557,6 @@ const Credits = () => {
             title="Credit Usage" 
             actions={
               <div style={{ display: 'flex', gap: '10px' }}>
-
                 <button 
                   className="torch-btn torch-btn-secondary"
                   onClick={() => navigate('/top-up-credits', { 
@@ -471,6 +567,21 @@ const Credits = () => {
                   })}
                 >
                   Top Up Credit
+                </button>
+                <button 
+                  className="torch-btn torch-btn-secondary"
+                  onClick={() => navigate(`/credits/${selectedOrg.id}/add-activity`)}
+                >
+                  Add Activity
+                </button>
+                <button 
+                  className="torch-btn torch-btn-secondary"
+                  onClick={() => {
+                    // Add Credit functionality - placeholder for now
+                    console.log('Add Credit clicked for org:', selectedOrg.id);
+                  }}
+                >
+                  Add Credit
                 </button>
                 <button 
                   className="torch-btn"
@@ -537,13 +648,67 @@ const Credits = () => {
             </div>
           </SectionCard>
 
-          {/* Transaction Table Section */}
-          <SectionCard title="Transaction Table" id="transactions-section">
+          {/* Transaction Section */}
+          <SectionCard title="Transaction" id="transactions-section">
             <DataTable
               data={transactions}
               columns={transactionColumns}
               statusFields={['status']}
             />
+            
+            {/* Pagination Controls for Transactions */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              gap: '10px', 
+              marginTop: '20px',
+              padding: '20px'
+            }}>
+              <button 
+                className="torch-btn torch-btn-secondary"
+                onClick={() => handleTransactionPageChange(currentTransactionPage - 1)}
+                disabled={currentTransactionPage === 1}
+                style={{ opacity: currentTransactionPage === 1 ? 0.5 : 1 }}
+              >
+                Previous
+              </button>
+              
+              <div style={{ display: 'flex', gap: '5px' }}>
+                {Array.from({ length: totalTransactionPages }, (_, index) => (
+                                  <button
+                  key={index + 1}
+                  className="torch-btn"
+                  onClick={() => handleTransactionPageChange(index + 1)}
+                                      style={{
+                    minWidth: '40px',
+                    height: '40px',
+                    padding: '8px',
+                    borderRadius: '6px',
+                    backgroundColor: currentTransactionPage === index + 1 ? 'white' : 'white',
+                    color: currentTransactionPage === index + 1 ? 'var(--torch-primary)' : '#666',
+                    border: currentTransactionPage === index + 1 ? '2px solid var(--torch-primary)' : 'none',
+                    fontWeight: currentTransactionPage === index + 1 ? 'bold' : 'normal'
+                  }}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+              
+              <button 
+                className="torch-btn torch-btn-secondary"
+                onClick={() => handleTransactionPageChange(currentTransactionPage + 1)}
+                disabled={currentTransactionPage === totalTransactionPages}
+                style={{ opacity: currentTransactionPage === totalTransactionPages ? 0.5 : 1 }}
+              >
+                Next
+              </button>
+              
+              <span style={{ marginLeft: 'auto', color: '#666', fontSize: '14px' }}>
+                Showing {indexOfFirstTransaction + 1}-{Math.min(indexOfLastTransaction, transactions.length)} of {transactions.length} transactions
+              </span>
+            </div>
           </SectionCard>
         </div>
       </div>
@@ -557,21 +722,56 @@ const Credits = () => {
         {/* Credit Dashboard Section */}
         <SectionCard title="Credit Dashboard">
           <div style={{ padding: '20px' }}>
-            <div className="torch-kpi-row" style={{ marginBottom: '0px' }}>
+            <div className="torch-kpi-grid" style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 1fr)', 
+              gap: '20px', 
+              marginBottom: '0px' 
+            }}>
               <div className="torch-card">
                 <div className="torch-card-header">Total Credits Purchased</div>
                 <div className="torch-card-value">12,000 credits</div>
                 <div className="torch-card-currency">$12,000.00</div>
               </div>
               <div className="torch-card">
-                <div className="torch-card-header">Total Credits Used</div>
+                <div className="torch-card-header">Used Credits</div>
                 <div className="torch-card-value">8,450 credits</div>
                 <div className="torch-card-currency">$8,450.00</div>
               </div>
               <div className="torch-card">
-                <div className="torch-card-header">Utilization Rate</div>
+                <div className="torch-card-header">Remaining Credits</div>
+                <div className="torch-card-value">3,550 credits</div>
+                <div className="torch-card-currency">$3,550.00</div>
+              </div>
+              <div className="torch-card">
+                <div className="torch-card-header">Utilization %</div>
                 <div className="torch-card-value">70%</div>
                 <div className="torch-card-subtitle">Current Usage</div>
+              </div>
+              <div className="torch-card">
+                <div className="torch-card-header">Expiring Soon Credits</div>
+                <div className="torch-card-value">615 credits</div>
+                <div className="torch-card-subtitle">Next 30 Days</div>
+              </div>
+              <div className="torch-card">
+                <div className="torch-card-header">Consumption Rate</div>
+                <div className="torch-card-value">485 credits</div>
+                <div className="torch-card-subtitle">Per Week</div>
+              </div>
+              <div className="torch-card">
+                <div className="torch-card-header">Active Organizations</div>
+                <div className="torch-card-value">8</div>
+                <div className="torch-card-subtitle">Total Companies</div>
+              </div>
+              <div className="torch-card">
+                <div className="torch-card-header">Monthly Growth</div>
+                <div className="torch-card-value">+12%</div>
+                <div className="torch-card-subtitle">Credit Usage</div>
+              </div>
+              <div className="torch-card">
+                <div className="torch-card-header">Average Credits</div>
+                <div className="torch-card-value">2,200</div>
+                <div className="torch-card-subtitle">Per Organization</div>
               </div>
             </div>
           </div>
@@ -580,17 +780,71 @@ const Credits = () => {
         {/* Organization Credit Usage Table */}
         <SectionCard title="Organization Credit Usage">
           <DataTable
-            data={organizations}
+            data={currentOrganizations}
             columns={columns}
             actions={actions}
             onActionClick={handleActionClick}
           />
+          
+          {/* Pagination Controls */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: '10px', 
+            marginTop: '20px',
+            padding: '20px'
+          }}>
+            <button 
+              className="torch-btn torch-btn-secondary"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              style={{ opacity: currentPage === 1 ? 0.5 : 1 }}
+            >
+              Previous
+            </button>
+            
+            <div style={{ display: 'flex', gap: '5px' }}>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index + 1}
+                  className="torch-btn"
+                  onClick={() => handlePageChange(index + 1)}
+                  style={{
+                    minWidth: '40px',
+                    height: '40px',
+                    padding: '8px',
+                    borderRadius: '6px',
+                    backgroundColor: currentPage === index + 1 ? 'white' : 'white',
+                    color: currentPage === index + 1 ? 'var(--torch-primary)' : '#666',
+                    border: currentPage === index + 1 ? '2px solid var(--torch-primary)' : 'none',
+                    fontWeight: currentPage === index + 1 ? 'bold' : 'normal'
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+            
+            <button 
+              className="torch-btn torch-btn-secondary"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              style={{ opacity: currentPage === totalPages ? 0.5 : 1 }}
+            >
+              Next
+            </button>
+            
+            <span style={{ marginLeft: 'auto', color: '#666', fontSize: '14px' }}>
+              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, organizations.length)} of {organizations.length} organizations
+            </span>
+          </div>
         </SectionCard>
 
-        {/* Overall Transactions Section */}
-        <SectionCard title="Overall Transactions">
+        {/* All Transactions Section */}
+        <SectionCard title="All Transactions">
           <DataTable
-            data={overallTransactions}
+            data={currentTransactions}
             columns={overallTransactionColumns}
             actions={overallTransactionActions}
             onActionClick={(actionKey, item) => {
@@ -598,6 +852,93 @@ const Credits = () => {
               console.log('View overall transaction clicked for:', item.orgName);
             }}
           />
+          
+          {/* Pagination Controls for Transactions */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: '10px', 
+            marginTop: '20px',
+            padding: '20px'
+          }}>
+            <button 
+              className="torch-btn torch-btn-secondary"
+              onClick={() => handleTransactionPageChange(currentTransactionPage - 1)}
+              disabled={currentTransactionPage === 1}
+              style={{ opacity: currentTransactionPage === 1 ? 0.5 : 1 }}
+            >
+              Previous
+            </button>
+            
+            <div style={{ display: 'flex', gap: '5px' }}>
+              {Array.from({ length: totalTransactionPages }, (_, index) => (
+                <button
+                  key={index + 1}
+                  className="torch-btn"
+                  onClick={() => handleTransactionPageChange(index + 1)}
+                  style={{
+                    minWidth: '40px',
+                    height: '40px',
+                    padding: '8px',
+                    borderRadius: '6px',
+                    backgroundColor: currentTransactionPage === index + 1 ? 'white' : 'white',
+                    color: currentTransactionPage === index + 1 ? 'var(--torch-primary)' : '#666',
+                    border: currentTransactionPage === index + 1 ? '2px solid var(--torch-primary)' : 'none',
+                    fontWeight: currentTransactionPage === index + 1 ? 'bold' : 'normal'
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+            
+            <button 
+              className="torch-btn torch-btn-secondary"
+              onClick={() => handleTransactionPageChange(currentTransactionPage + 1)}
+              disabled={currentTransactionPage === totalTransactionPages}
+              style={{ opacity: currentTransactionPage === totalTransactionPages ? 0.5 : 1 }}
+            >
+              Next
+            </button>
+            
+            <span style={{ marginLeft: 'auto', color: '#666', fontSize: '14px' }}>
+              Showing {indexOfFirstTransaction + 1}-{Math.min(indexOfLastTransaction, overallTransactions.length)} of {overallTransactions.length} transactions
+            </span>
+          </div>
+        </SectionCard>
+
+        {/* Top 10 Companies with High Credit Usage */}
+        <SectionCard title="Top 10 Companies with High Credit Usage">
+          <DataTable
+            data={organizations.slice(0, 10)}
+            columns={[
+              { key: 'name', label: 'Company Name' },
+              { key: 'used', label: 'Credits Used' },
+              { key: 'consumptionRate', label: 'Consumption Rate (per week)' },
+              { key: 'expiringSoon', label: 'Expiring Soon' },
+              { key: 'location', label: 'Location' }
+            ]}
+            actions={[
+              { type: 'button', label: 'View Details', key: 'view' }
+            ]}
+            onActionClick={(actionKey, item) => {
+              navigate(`/organizations/${item.id}`);
+            }}
+          />
+          
+          {/* Pagination Info for Top 10 */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            marginTop: '20px',
+            padding: '20px',
+            color: '#666', 
+            fontSize: '14px' 
+          }}>
+            Showing top 10 companies by credit usage
+          </div>
         </SectionCard>
       </div>
     </div>

@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import SectionCard from '../components/SectionCard';
 import DataTable from '../components/DataTable';
 
 const Organizations = () => {
+  const navigate = useNavigate();
+  
   const organizations = [
     {
       id: 615,
@@ -115,6 +118,16 @@ const Organizations = () => {
   return (
     <div className="torch-page">
       <div className="torch-container">
+        {/* Page Header */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+          <button 
+            className="torch-btn torch-btn-secondary"
+            onClick={() => navigate('/organizations/new')}
+          >
+            New Organization
+          </button>
+        </div>
+
         <div style={{ display: 'flex', gap: '35px' }}>
           {/* Main Content - Table (takes remaining width) */}
           <section style={{ flex: 1 }}>
